@@ -1,0 +1,7 @@
+在QT平台库的配置时候   
+我们可以选择自己安装配置
+、configure 
+如果想再次配置  必须要make confclean
+同理 如果你make了  也必须要make clean
+当然如果我配置了10个选项  也已经make了 现在我要去掉一个./configure  的配置参数
+ 我用不用make clean 

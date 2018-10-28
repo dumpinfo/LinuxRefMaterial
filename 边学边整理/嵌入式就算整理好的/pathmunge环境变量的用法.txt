@@ -1,0 +1,2 @@
+pathmunge /usr/local/arm/bin   这是安装arm-linux-gcc交叉工具链的另外一种环境变量的加入系统配置里面
+当然也要source /etc/profile

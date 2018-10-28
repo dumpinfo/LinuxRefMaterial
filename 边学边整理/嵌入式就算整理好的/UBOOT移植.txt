@@ -1,0 +1,34 @@
+主要是板子级别的移植
+先找到smdk2410.h这个文件                                                            我们一般也是配置这个文件的   
+cpu的种类	mcu的类型	开发板的型号  是否使用mmu （这也是arm7和arm9的区别）
+一般的bootloader是不适用中断的 一般是使用轮询的方式 。。。 网卡的类型的选择  。。。这里也有网卡的基地址  串口的选择
+配置使用的命令 例如可以添加ping这个命令 还有自主启动等待时间 3   3秒  自主启动的命令 以及可以更改其提示符    默认的启动地址  这个地址就是bootm使用的 可用的波特率   那么如何抑制uboot呢
+这里面需要硬件  还有软件的配置  在移植的过程中我们就是要更改我们的头文件
+	开始移植之前首先要分析uboot 已经支持的开发板  选择出硬件配置最接近的开发板  选择的原则是  首先选择mmu相同的开发板 如果没有  则选择MPU相同的开发板
+选择完参考之后  
+第一步  我们应该先修改Makefile文件  这这里面添加新的配置选项  
+	我先更改命令  例如我就  make lei_uboot
+	arm:CPU架构
+	arm920t:CPU类型对应cpu/arm920t目录的代码
+	GEC2440_LEI： 开发板型号 这个自己可以设定/board/GEC2440_LEI
+	NULL： 这个是开发者
+	s3c24x0: 片上系统
+这里是在Makefile 中添加的目标这个可以拷贝上面的
+lei_2440config : unconfig
+	@./mkconfig$(@:_config=)arm arm920t GEC2440_LEI NULL s3c24x0
+第二步：
+在/board 目录中创建一个属于新开发板的目录向目录中添加文件并修改
+mkdir -p board/GEC2440_LEI
+cp -rf board/smdk2440/*  board/GEC2440_LEI
+第三步：
+在开发板上
+添加新的配置文件 需要修改
+
+第四步：
+make lei2440config
+
+第五步：
+make CROSS_COMPILE=arm-linux-
+成功编译后会得到U_BOOT映像
+
+安装crosstool-uboot这个交叉工具链用来编译uboot

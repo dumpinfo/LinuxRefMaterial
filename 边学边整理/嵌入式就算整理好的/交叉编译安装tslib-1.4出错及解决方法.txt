@@ -1,0 +1,36 @@
+首先下载tslib-1.4.tar.gz
+解压:tar xzvf tslib-1.4tzr.gz
+进入tslib目录
+cd tslib
+1.执行./autogen.sh
+提示错误一：
+./autogen.sh: 4: autoreconf: not found 
+解决方法：sudo apt-get install autoconf automake libtool 
+2.执行./configure --host=arm-linux --prefix=/usr/local/tslib 
+提示错误二：  
+ts_test.o(.text+0x218): In function `main': 
+: undefined reference to `rpl_malloc' 
+fbutils.o(.text+0x234): In function `open_framebuffer': 
+: undefined reference to `rpl_malloc' 
+collect2: ld returned 1 exit status 
+make[2]: *** [ts_test] Error 1 
+make[2]: Leaving directory `/home/gfpeak/Desktop/tslib/tests' 
+make[1]: *** [all-recursive] Error 1 
+make[1]: Leaving directory `/home/gfpeak/Desktop/tslib' 
+make: *** [all] Error 2 
+解决方法是在编译的时候 ./configure 后面的参数没有设置对，正确设置如下： 
+ ./configure --prefix=/usr/local/tslib/ --host=arm-linux ac_cv_func_malloc_0_nonnull=yes 
+3.执行make 
+4.执行sudo make install 
+
+/usr/local/tslib表示tslib安装后的路径（PC机的） 
+
+修改ts.conf内容 
+# vi /usr/local/tslib/etc/ts.conf 
+module_raw input         
+module pthres pmin=1        
+module variance delta=30       
+module dejitter delta=100      
+module linear 
+然后将整个tslib文件夹，下载到开发板的对应路径下（/usr/local）。
+开发板配置环境变量  这里先不写了

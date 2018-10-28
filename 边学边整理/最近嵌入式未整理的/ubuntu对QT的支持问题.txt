@@ -1,0 +1,29 @@
+
+暂时是解决了。在国外网站上看到了解决方法：
+安装gnome shell,并在登录时使用gnome桌面。
+sudo apt-get install gnome-shell 
+原因：ubuntu自带的unity对于QT的支持可能存在一些问题。
+你上QT官网上去下载啊。
+这是qT的官方下载地址
+http://qt.nokia.com/downloads
+
+如何查看LINUX操作系统是多少位的
+方法1：
+
+查看linux是不是64位的命令! file /sbin/init
+
+结果会出来 xx bit
+
+方法二：
+
+# getconf LONG_BIT
+32
+getconf命令还可以获取系统的基本配置信息，比如操作系统位数，内存大小，磁盘大小等。
+
+$getconf -a
+
+嗯，是这个原因，安装时候虽然加了文件的权限，但是执行的时候没有用sudo执行，虽然很早就解决了，还是谢谢
+
+
+cannot find –lGL；解决办法：
+sudo apt-get install libgl1-mesa-dev 

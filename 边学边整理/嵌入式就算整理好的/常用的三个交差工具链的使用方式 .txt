@@ -1,0 +1,12 @@
+编译器的使用
+arm-linux-gcc
+arm-linux-gcc hello.c -o hello
+
+查看返汇编工具
+arm-linux-objdump
+arm-linux-objdump -D -S hello
+
+ELF文件查看工具
+arm-linux-readelf
+arm-linux-readelf -a hello
+arm-linux-readelf -d hello //查看hello使用的动态库

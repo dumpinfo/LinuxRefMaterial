@@ -1,0 +1,40 @@
+驱动模块Makefile解析
+
+举例：
+
+ifeq ($(KERNELRELEASE),)
+KERNELDIR ?= /home/linux/linux-2.6.22.6
+PWD := $(shell pwd)
+modules:
+	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
+modules_install:
+        $(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install
+clean:
+        rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions
+.PHONY: 
+        modules modules_install clean
+else
+        obj-m := myhello.o
+endif
+
+
+分析：
+1、其中有一些是我们常见或是见过的，第一个ifeq ($(KERNELRELEASE),)目前，并无用处，它的由来是指在Linux源码根目录下的Makefile编译内核时，KERNELRELEASE宏会被定义，那么如果是从源码根目录开始的make则会将myhello.o模块编译进内核。
+
+2、KERNELDIR ?= /home/linux/linux-2.6.22.6，这句是对KERNELDIR进行赋值，这个变量是后面我们用到的指代内核源码目录用的。
+
+3、PWD := $(shell pwd)，这句是对PWD变量进行赋值，作用是将$(shell pwd)的返回结果既求得当前目录的路径赋值给PWD，这个变量我们在后面指代我们要编译的驱动程序所在的位置。
+
+4、modules:
+         $(MAKE) -C $(KERNELDIR) M=$(PWD) modules
+这句是Makefile的规则：这里的$(MAKE)就相当于make，-C 选项的作用是指将当前工作目录转移到你所指定的位置。“M=”选项的作用是，当用户需要以某个内核为基础编译一个外部模块的话，需要在make modules 命令中加入“M=dir”，程序会自动到你所指定的dir目录中查找模块源码，将其编译，生成KO文件。
+
+5、modules_install:
+         $(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install
+这个命令是模块的安装，在Makefile中搜索“lib\/modules”可以看到下面的语句，通过阅读你不难找到这个“MODLIB”的用处，它是用来指定安装路径的，而变量“INSTALL_MOD_PATH”往往为空。
+MODLIB = $(INSTALL_MOD_PATH)/lib/modules/$(KERNELRELEASE)
+         Export MODLIB
+
+6、.PHONY:
+         modules modules_install clean
+    这句话是的作用是保证modules,modules_install,clean这三个命令能正常完成。.PHONY 这是一个特殊目标名称。.PHONY目标的具体意思是如果在Makefile的工作目录中有名如：modules,modules_install,clean等文件时命令会出错。它是防止这出错的方式。

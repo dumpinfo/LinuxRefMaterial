@@ -1,0 +1,242 @@
+在RHEL 5平台上安装配置arm-linux-gcc  2011-02-23 19:35:40|  分类： 嵌入式开发环境 |  标签： |字号大中小 订阅 .
+
+在linux平台上安装好的基础上，开始配置arm-linux-gcc，使其正常工作
+
+一，安装前准备
+
+1，下载并安装arm-linux-gcc
+
+arm-linux-gcc-4.2.1的版本在http://ftp.snapgear.org/pub/snapgear/tools/arm-linux/这里可以下载，最新版arm-linux-tools-20080623.tar.gz这个可能是4.2.4的版本，因为下面有编译4.2.4的方法还有相应的代码包，build-arm-linux-4.2.14，此版本由于过大，我没有下载。
+
+下面的这个是ARM官方给的下载链接http://www.codesourcery.com/gnu_toolchains/arm/download.html，然后将HOST选择为IA32 GNU/Linux，点击下载就可以了。不过前缀为arm-2010.09-51-arm-none-eabi-i686-pc-linux-gnu而不是arm-linux-。。。
+
+       在友善之臂官方网站http://www.arm9.net/download.asp下载arm-linux-gcc4.4.3。
+
+2，删除之前安装有旧版本，执行
+
+ [root@localhost ~]# rm -rf /opt/arm
+
+3，对新版本arm-linux-gcc-4.4.3进行解压（注意，如果我们加上了-C，那么就会自动解压到/usr/local/arm/这个目录下），但是友善之臂按照下列方式解压，不会解压到/usr/local/arm/目录下的，这是因为友善之臂把/usr/local/arm/目录修改成了 /opt/FriendlyARM/toolschain/，除非自己在把它修改过来
+
+[root@localhost ~]# tar -ivxzf /smbroot/arm-linux-gcc-4.4.3.tar.gz  -C /
+
+4，修改配置文件，将arm-linux-gcc添加到环境变量中，因为arm-linux-gcc的命令是在/usr/local/arm/4.4.3/bin下，其目的通过对全局变量绑定使之能够在任意一个目录下能够执行该命令。
+
+打开设置文件
+
+[root@localhost opt]# vi /etc/profile
+
+在打开的文件的
+
+# Path manipulation
+if [ "$EUID" = "0" ]; then
+        pathmunge /sbin
+        pathmunge /usr/sbin
+        pathmunge /usr/local/sbin
+        pathmunge /usr/local/arm/4.4.3/bin
+fi
+或者在文件末尾添加
+
+export PATH=$PATH:/usr/local/arm/4.4.3/bin
+
+保存退出
+
+5，立即使新的环境变量生效，不用重启电脑
+
+[root@localhost opt]#  source /etc/profile
+
+[root@localhost opt]# 
+
+6，检查是否将路径加入到PATH：
+
+[root@localhost opt]# echo $PATH
+
+显示的内容中有/usr/local/arm/4.4.3/bin，说明已经将交叉编译器的路径加入PATH。至此，交叉编译环境安装完成。
+
+7，测试是否安装成功
+
+首先，执行find命令查询一下arm-linux-gcc的位置
+
+[root@localhost ~]# find / -name arm-linux-gcc
+
+/opt/arm/toolschain/4.4.3/bin/arm-linux-gcc
+[root@localhost ~]# 
+
+可以看到arm-linux-gcc的位置与环境变量中设定的路径一致
+
+接下来查询arm-linux-gcc的版本
+
+[root@localhost bin]# arm-linux-gcc -v
+Using built-in specs.
+Target: arm-none-linux-gnueabi
+Configured with: /opt/FriendlyARM/mini2440/build-toolschain/working/src/gcc-4.4.3/configure --build=i386-build_redhat-linux-gnu --host=i386-build_redhat-linux-gnu --target=arm-none-linux-gnueabi --prefix=/opt/FriendlyARM/toolschain/4.4.3 --with-sysroot=/opt/FriendlyARM/toolschain/4.4.3/arm-none-linux-gnueabi//sys-root --enable-languages=c,c++ --disable-multilib --with-arch=armv4t --with-cpu=arm920t --with-tune=arm920t --with-float=soft --with-pkgversion=ctng-1.6.1 --disable-sjlj-exceptions --enable-__cxa_atexit --with-gmp=/opt/FriendlyARM/toolschain/4.4.3 --with-mpfr=/opt/FriendlyARM/toolschain/4.4.3 --with-ppl=/opt/FriendlyARM/toolschain/4.4.3 --with-cloog=/opt/FriendlyARM/toolschain/4.4.3 --with-mpc=/opt/FriendlyARM/toolschain/4.4.3 --with-local-prefix=/opt/FriendlyARM/toolschain/4.4.3/arm-none-linux-gnueabi//sys-root --disable-nls --enable-threads=posix --enable-symvers=gnu --enable-c99 --enable-long-long --enable-target-optspace
+Thread model: posix
+gcc version 4.4.3 (ctng-1.6.1) 
+[root@localhost bin]# 
+
+可以看到arm-linux-gcc的版本号，至此，arm-linu-gcc已成功安装。
+
+ 二，测试
+
+1，在终端中编写test.c测试程序
+
+[root@localhost ~]# vi test.c
+[root@localhost ~]# arm-linux-gcc test.c -o test
+/opt/arm/toolschain/4.4.3/bin/../libexec/gcc/arm-none-linux-gnueabi/4.4.3/cc1: /usr/lib/libstdc++.so.6: version `GLIBCXX_3.4.9' not found (required by /opt/arm/toolschain/4.4.3/lib/libppl_c.so.2)
+/opt/arm/toolschain/4.4.3/bin/../libexec/gcc/arm-none-linux-gnueabi/4.4.3/cc1: /usr/lib/libstdc++.so.6: version `GLIBCXX_3.4.9' not found (required by /opt/arm/toolschain/4.4.3/lib/libppl.so.7)
+[root@localhost ~]# 
+
+用以下命令查看
+
+[root@localhost ~]# strings /usr/lib/libstdc++.so.6|grep GLIBCXX
+GLIBCXX_3.4
+GLIBCXX_3.4.1
+GLIBCXX_3.4.2
+GLIBCXX_3.4.3
+GLIBCXX_3.4.4
+GLIBCXX_3.4.5
+GLIBCXX_3.4.6
+GLIBCXX_3.4.7
+GLIBCXX_3.4.8
+GLIBCXX_FORCE_NEW
+[root@localhost ~]# 
+可以看到libstdc++.so.6的最高版是GLIBCXX_3.4.8，而不是GLIBCXX_3.4.9，因此需要对libstdc++.so.6进行升级
+
+方法一，参照这篇文章的做法http://wenku.baidu.com/view/ba4f4e222f60ddccda38a01a.html
+
+直接下载较高版本的库libstdc++.so.6.0.10，网址http://download.csdn.net/source/1670346
+
+先删除libstdc++.so.6
+
+[root@localhost ~]# rm /usr/lib/libstdc++.so.6
+
+rm：是否删除 符号链接 “/usr/lib/libstdc++.so.6”? y
+
+[root@localhost ~]# 
+
+然后将下载的libstdc++.so.6.0.10复制到/usr/lib/目录下面
+
+[root@localhost ~]# cp /smbroot/libstdc++.so.6.0.10 /usr/lib/
+
+[root@localhost ~]# 
+
+再建立符号链接
+
+[root@localhost ~]# ln -s /usr/lib/libstdc++.so.6.0.10 /usr/lib/libstdc++.so.6
+
+[root@localhost ~]# 
+
+检验是否替换完成
+
+[root@localhost ~]#  strings /usr/lib/libstdc++.so.6|grep GLIBCXX
+
+GLIBCXX_3.4
+
+GLIBCXX_3.4.1
+
+GLIBCXX_3.4.2
+
+GLIBCXX_3.4.3
+
+GLIBCXX_3.4.4
+
+GLIBCXX_3.4.5
+
+GLIBCXX_3.4.6
+
+GLIBCXX_3.4.7
+
+GLIBCXX_3.4.8
+
+GLIBCXX_3.4.9
+
+GLIBCXX_3.4.10
+
+GLIBCXX_FORCE_NEW
+
+GLIBCXX_DEBUG_MESSAGE_LENGTH
+
+[root@localhost ~]# 
+
+重新测试交叉编译是否能用
+
+[root@localhost ~]# arm-linux-gcc test.c -o test
+
+[root@localhost ~]# 
+
+编译成功，执行
+
+[root@localhost ~]# ./test
+
+bash: ./test: cannot execute binary file
+
+[root@localhost ~]
+
+方法二，（参照网上搜来的办法，还没尝试）
+
+下载最新版本glibc-2.13.tar.gz 包含libstdc++.so.6的库，
+
+然后编译安装glibc 
+
+wget  http://ftp.gnu.org/gnu/glibc/glibc-2.13.tar.gz
+
+下载glibc-linuxthreads
+
+wget http://ftp.gnu.org/gnu/glibc/glibc-linuxthreads-2.13.tar.gz
+
+解压
+
+tar -zxvf glibc-2.13.tar.gz
+
+cd glibc-2.13
+
+tar -zxvf ../glibc-linuxthreads-2.3.2.tar.gz
+
+cd ..
+
+./glibc-2.13/configure --prefix=/usr --disable-profile --enable-add-ons --libexecdir=/usr/lib --with-headers=/usr/include
+
+make
+
+make install
+
+注意点：
+
+1、要将glibc-linuxthreads解压到glibc目录下。
+
+2、不能在glibc当前目录下运行configure。
+
+ 三、工具使用
+
+1，编译工具arm-linux-gcc
+
+例如arm-linux-gcc hello.c -o hello
+
+2，反汇编工具arm-linux-gcc 
+
+例如arm-linux-objdump -D -S hello
+
+3，elf文件查看工具arm-linux-readelf
+
+arm-linux-readelf  -a hello (查库所有库)
+
+arm-linux-readelf -d hello (查看动态链接库)
+
+ 
+
+参考文章
+
+http://wenku.baidu.com/view/ba4f4e222f60ddccda38a01a.html
+
+Tekkaman Ninja 博主的文章在Fedora 下建立 ARM－Linux 交叉编译环境 
+
+李白博主的文章crosstool安装详解
+
+*****************************************************************************
+
+运行hello : ./hello
+
+　　bash: ./hello: cannot execute binary file(无法运行的2进制文件,因为生成的是arm下的2进制文件 );
+
+
+ 

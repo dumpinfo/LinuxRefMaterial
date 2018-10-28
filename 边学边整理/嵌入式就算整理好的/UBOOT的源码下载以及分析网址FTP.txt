@@ -1,0 +1,67 @@
+所有版本的u-boot源代码压缩包都可以在ftp://ftp.denx.de/pub/u-boot/下载。
+关于u-boot源代码的信息，看http://www.denx.de/wiki/U-Boot/SourceCode 
+UBOOT的命令
+环境变量
+	setenv name 123//增加和修改
+	设置 名字 值 
+	例如：
+	setenv ipserver 192.168
+	setenv name //环境变量的删除
+	saveenv   //保存环境变量
+	printenv //打印环境变量
+       uboot	 中添加环境变量时候是加在内存里面  如果掉电在看是不存在的 必须   saveenv进行环境变量保存在flash 
+
+	
+文件下载命令
+	
+	tftp  
+	使用tftp命令必须配置好如下参数（也可以使用ping命令）
+		setenv ethaddr 12:12:12:12:12:12
+		setenv ipaddr 192.168.1.1
+		setenv serverip 192.168.1.154(服务器的ip地址)
+	tftp 32000000 uIamge //文件下载320000000是下载的地址
+		把uImage下载到地址32000000处
+    注意：数字前面我们虽然没有加0x但是默认是十六进制的
+	通过串口下载二进制文件 
+	loadbin命令
+	例如：
+	用这两个命令下载同一个文件的时间有什么区别呢？时间不同而已，loadbin 下载        的速度很慢很慢的
+	
+内存操作命令（妈的）
+	md  显示内存区的内容
+	使用实例 md [.b, .w, .l]address//.w.l.b都是长度标示符
+		md.w 100000  用法就是这样  是显示内存区域的内容
+		b 是byte 字节为单位显示w  是word （2个字节）
+	mm命令 修改内存的里面的内容
+flash操作相关的命令
+	flinfe
+	这个命令我们可以知道flash的大小一般是以bit为单位16mbit =2MB
+	flash的扇区不一定是固定的大小 （硬件决定的）
+	每个扇区多大，一共有多少个扇区
+protect flash写保护
+	protece off all 关闭所有扇区的写保护
+	protect on all 打开
+	protect on start end //protect on 某扇区的起始地址 某扇区的结束地址on 也       可以是off
+erase 扇区的擦出(某个扇区全部写1)
+	erase start end 从start到end的扇区擦出start 为起始扇区的地址，end 为要擦除的最后一个扇区的结束地址（如果有norflash,那么我们都要先擦除，擦除就是写入1，因为norflash 是按照字节来写入的，无法写入1，所以擦除必须写入1）
+	例如：erase 30000 1effff
+cp拷贝命令（内存与内存，内存与flash之间的拷贝）默认是.l 
+	cp [.b,.w,.l(32bit)]saddress daddress len
+	cp.b 31000000 50000 d0000
+	解释：将内存地址0x31000000处的数据（长度为0xd0000）拷贝到地址为0x50000的flash中
+	cp.b 32000000 12000000 c0000
+	解释：将内存地址0x32000000处的数据（长度为0xd0000）拷贝到地址为0x120000处（flash）
+注意：：：：在使用cp向norflash中写入数据的时候 必须要先擦除
+go执行程序命令 
+	go addr[arg..]携带的参数
+	bootm [addr[arg...]]
+	bootm当然也可以不用加地址参数  因为会有一个默认的地址但是go是不可以的必须要加相应的地址 go命
+令和bootm是有区别的 请查阅其他的资料
+
+最后一个常用的命令
+	bdinfo 就是开发板的信息
+设置自动的启动 也就是自动加载的模式 这个也是在这里设置的  让uboot去完成一些工作
+我希望我的开发板一上电就可以自动的加载内核
+这个时候我们需要配置两个环境变量 是bootcmd这个变量(空格斜杠分号)
+setenv   bootcmd tftp 31000000 uImage \; bootm 31000000 
+	

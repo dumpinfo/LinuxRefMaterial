@@ -1,0 +1,12 @@
+1.arm-linux-ld -T 链接器，后面可接text,data,bss，分别为代码段，数据段，bss段，再接链接到的地址，链接对象。生成对象一般是elf文件
+例如：arm-linux-ld -Ttext 0x30000000 led.o -o led_elf
+
+2.arm-linux-objcopy 常用于将elf文件转换为二级制文件
+例如：arm-linux-objcopy -O binary -S led_on_elf led_on.bin
+ 其中，-O binary指定生成对象是二进制格式，-S指定源文件，最后才加输出文件名
+
+3.arm-linux-objdump 将二级制文件显示成汇编格式，即反汇编
+例如：arm-linux-objdump -D led_on_elf > led_on.dis
+ 其中，-D表示反汇编所有段，>符表示传输内容到某个文件（如果没有的话可以创建，有的话刷新文件内容）
+
+

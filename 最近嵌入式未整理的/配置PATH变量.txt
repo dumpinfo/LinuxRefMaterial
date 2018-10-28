@@ -1,0 +1,46 @@
+cannot find –lGL；解决办法：sudo apt-get install libgl1-mesa-dev
+
+软件 源到哪儿去了？ 发现好多软件 不能apt-get安装 ，因为 找不到
+可以在  
+root@lei:~# vim /etc/apt/sources.list
+deb http://archive.canonical.com/ubuntu natty partner
+源文件获取地址
+
+
+$表明是变量
+PATH  只是针对当前的路径
+
+
+vim export PATH=/opt/Qt5.1.1/Tools/QtCreator/bin/:$PATH
+
+
+root@lei:~# source /etc/profile
+root@lei:~# qtcreator&
+说明这里加了&和不加是有区别的   加了& 程序执行  终端可以使用
+不加  终端不可用  只有退出的时候才可用
+
+查找文件名指令
+root@lei:~# find -name "*Qt*"
+./.local/share/data/Nokia/QtSimulator
+./.config/QtProject.conf
+./.config/Nokia/QtCreator.ini
+./.config/Nokia/QtCreator.db
+./.config/QtProject
+./.config/QtProject/QtCreator.ini
+./.config/QtProject/QtCreator.db
+root@lei:~# 
+
+更改用户名字
+root@lei:/# export PS1="sb@\u"\#
+sb@root#cd /root/
+sb@root#cd /etc/
+sb@root#export PS1="sb@\r"\#
+#b@
+#b@
+#b@
+#expoexport PS1="sb@\u"\#
+sb@root#ls
+
+
+
+

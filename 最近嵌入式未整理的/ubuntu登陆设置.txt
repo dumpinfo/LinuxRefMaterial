@@ -1,0 +1,47 @@
+/etc/lightdm/lightdm.conf 里面改成"autologin-user=root"就自己root登陆了
+
+
+ubuntu默认进入文本模式的修改方法：
+
+1。首先，查看自己所安装的ubuntu版本：
+
+leekwen@kwen:~$ cat /etc/issue
+Ubuntu 9.10 \n \l
+2。根据不同的版本，操作方法有所不同，具体如下：
+
+ubuntu 10.10以前的操作方法：
+
+2.1 第一步，具体命令及操作如下：
+
+leekwen@kwen:~$ sudo vi /etc/init/rc-sysinit.conf
+
+
+env DEFAULT_RUNLEVEL=3   <------将原来的env DEFAULT_RUNLEVEL=2修改为env DEFAULT_RUNLEVEL=3
+
+2.2 第二步，具体命令及操作如下：
+
+leekwen@kwen:~$ sudo vi /etc/init/gdm.conf
+
+ start on runlevel [245]   <------增加此行
+ stop on runlevel [0136]  <-----将原来的stop on runlevel [016]修改为stop on runlevel [0136] 
+
+2.3 第三步，具体命令及操作如下：
+
+leekwen@kwen:~$ sudo reboot <-----------重新启动即可
+
+如果在本地机器上进入后，想切换到图形界面，可直接输入startx即可。
+
+ubuntu 10.10以后的操作方法：
+
+1）: 运行 sudo gedit /etc/default/grub
+
+2）: 找到 GRUB_CMDLINE_LINUX_DEFAULT=”quiet splash”
+
+3）: 改为 GRUB_CMDLINE_LINUX_DEFAULT=”quiet splash text”
+
+4）: 运行 sudo update-grub
+
+上面把“GRUB_CMDLINE_LINUX_DEFAULT=”quiet splash””中的”quiet splash”改为text也是文本登陆的！
+
+
+文本登陆改为界面登陆方法:startx

@@ -1,0 +1,7 @@
+配置编译安装ARM平台qt:  下载页面：http://qt-project.org/downloads
+
+选择 Qt libraries 4.8.5 for Linux/X11 (230 MB) (Info) 
+得到
+qt-everywhere-opensource-src-4.8.5.tar.gz，
+这个和 Qt libraries 4.8.5 for embedded Linux (230 MB) (Info) 是同一个文件，配置不同就可以编译出不同的版本
+

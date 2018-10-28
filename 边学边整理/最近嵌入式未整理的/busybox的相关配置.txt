@@ -1,0 +1,22 @@
+busybox源码下载网址
+http :/ / www. busybox. net 
+我现在用的版本是1.21.1
+29 June 2013 -- BusyBox 1.21.1 (stable) 
+BusyBox 1.21.1. (git, patches, how to add a patch)
+
+在编译之前，首先需要修改busybox根目录下的Makefile，使用交叉编译器。
+
+　　将189行的ARCH?=$(SUBARCH)修改为ARCH?=arm，164行的CROSS_COMPILE?=修改为CROSS_COMPILE?=arm_linux-修改后执行make命令编译busybox
+
+linuxrc是内核启动的init进程，那内核又如何知道要启动的init进程是哪个呢？它是由uboot传递给linux内核参数中"init=xxx"决定的。在我的目标板的uboot中传递给内核的参数为"init=/linuxrc"。内核如何启动init进程可以查看内核代码init/main.c中的init_post函数。
+
+
+构建lib库
+
+虽然通过编译busybox生成了我们需要的可执行文件，但现在在目标板上仍然无法运行，需要添加lib库来支持可执行文件运行。可以使用uclibc和glibc来构建lib库。由于编译lib库相对复杂，而我们又有现成的lib库可以使用，这里我们就实行拿来主义。现成的lib库就在我们的交叉编译工具arm-linux-gcc的目录下，在本人主机上的绝对路径为/opt/FriendlyARM/toolschain/4.4.3/arm-none-linux-gnueabi/lib，
+
+把该lib目录下的所有文件复制到目标板文件系统lib下，执行命令：
+
+#cp -r /opt/FriendlyARM/toolschain/4.4.3/arm-none-linux-gnueabi/lib /home/nfs/rootfs/lib
+
+PS:注意要加-r选项，把软链接文件原样复制过来，不加-r会复制软链接的链接文件，造成存储空间的浪费。

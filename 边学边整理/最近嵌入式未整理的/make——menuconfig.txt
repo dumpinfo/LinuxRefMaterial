@@ -1,0 +1,3 @@
+注意：使用make menuconfig
+需要安装ncurses( sudo apt-get install ncurses-dev)
+本篇文章来源于 Linux公社网站(www.linuxidc.com)  原文链接：http://www.linuxidc.com/Linux/2012-06/63092.htm
